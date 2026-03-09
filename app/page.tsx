@@ -5,20 +5,30 @@ import {
   formatDateLabel,
   toFahrenheit,
 } from "../shared/weather-data";
+import { tracer } from "../shared/tracer";
 
 export default async function Page() {
-  const weather = await fetchAllCityWeather();
-  const firstDate = weather.find((city) => city.date)?.date;
-  const dateLabel = firstDate
-    ? formatDateLabel(firstDate)
-    : new Date().toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
+  const span = tracer.startSpan("loaded-city");
+  
+  try {
+    const weather = await fetchAllCityWeather();
+    
+    span.setAttribute("cities", JSON.stringify(weather.map((city) => city.slug)));
+    span.setAttribute("page.name", "home");
+    
+    const firstDate = weather.find((city) => city.date)?.date;
+    const dateLabel = firstDate
+      ? formatDateLabel(firstDate)
+      : new Date().toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
 
-  // OpenTelemetry: add span for home page view and record API latency.
-  return (
+    span.end();
+
+    // OpenTelemetry: add span for home page view and record API latency.
+    return (
     <main className="page">
       <nav className="nav">
         <div className="row">
@@ -96,4 +106,9 @@ export default async function Page() {
       </section>
     </main>
   );
+  } catch (error) {
+    span.recordException(error as Error);
+    span.end();
+    throw error;
+  }
 }
