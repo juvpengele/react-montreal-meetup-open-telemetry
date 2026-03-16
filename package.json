@@ -9,6 +9,7 @@
   "dependencies": {
     "@opentelemetry/api": "^1.4.1",
     "@opentelemetry/api-logs": "^0.213.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.71.0",
     "@opentelemetry/exporter-prometheus": "^0.213.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.213.0",
     "@opentelemetry/instrumentation": "^0.213.0",
@@ -19,6 +20,7 @@
     "@opentelemetry/sdk-trace-node": "^2.6.0",
     "@opentelemetry/semantic-conventions": "^1.40.0",
     "@sentry/nextjs": "^10.42.0",
+    "@sentry/opentelemetry": "^10.42.0",
     "@vercel/otel": "latest",
     "next": "latest",
     "react": "^18.2.0",
