@@ -3,7 +3,7 @@ import type { SpanProcessor } from "@opentelemetry/sdk-trace-node";
 function resolveOtlpEndpoint(isProduction: boolean): string | undefined {
   if (isProduction) return undefined;
   const configured = process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
-  return configured ? `${configured}/v1/traces` : "http://localhost:4318/v1/traces";
+  return configured ? `${configured}` : "http://localhost:4318/v1/traces";
 }
 
 async function buildSpanProcessors(isProduction: boolean): Promise<SpanProcessor[]> {
