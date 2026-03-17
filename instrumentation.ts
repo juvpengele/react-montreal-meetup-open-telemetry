@@ -1,9 +1,8 @@
 import type { SpanProcessor } from "@opentelemetry/sdk-trace-node";
 
-function resolveOtlpEndpoint(isProduction: boolean): string | undefined {
-  if (isProduction) return undefined;
+function resolveOtlpEndpoint(): string {
   const configured = process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
-  return configured ? `${configured}` : "http://localhost:4318/v1/traces";
+  return configured ?? "http://localhost:4318/v1/traces";
 }
 
 async function buildSpanProcessors(isProduction: boolean): Promise<SpanProcessor[]> {
@@ -11,7 +10,7 @@ async function buildSpanProcessors(isProduction: boolean): Promise<SpanProcessor
   const { OTLPTraceExporter } = await import("@opentelemetry/exporter-trace-otlp-http");
   const spanProcessors: SpanProcessor[] = [];
 
-  const otlpEndpoint = resolveOtlpEndpoint(isProduction);
+  const otlpEndpoint = resolveOtlpEndpoint();
   spanProcessors.push(
     new SimpleSpanProcessor(new ConsoleSpanExporter()),
     new BatchSpanProcessor(new OTLPTraceExporter({ url: otlpEndpoint }))
@@ -46,7 +45,10 @@ async function startNodeSDK(isProduction: boolean) {
 }
 
 export async function register() {
+
+  console.log(process.env);
   if (process.env.NEXT_RUNTIME !== "nodejs") return;
+
 
   const isProduction = process.env.NODE_ENV === "production";
   console.log(`🔭 OpenTelemetry: register() called (${isProduction ? 'production' : 'development'} mode)`);
